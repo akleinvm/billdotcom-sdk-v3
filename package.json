@@ -1,0 +1,52 @@
+{
+  "name": "billdotcom-sdk-v3",
+  "version": "1.0.0",
+  "description": "TypeScript SDK for Bill.com V3 API",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "vitest",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "bill.com",
+    "billdotcom",
+    "api",
+    "sdk",
+    "accounting",
+    "payments",
+    "invoices",
+    "bills",
+    "vendors"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.19.25",
+    "dotenv": "^16.6.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.1"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  }
+}
