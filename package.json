@@ -5,9 +5,11 @@
   "main": "./dist/index.js",
   "scripts": {
     "test": "vitest",
+    "test:run": "vitest run",
+    "test:schemas": "vitest run tests/schemas",
+    "validate:entities": "npx tsx scripts/validate-entities.ts",
     "build": "tsup",
     "dev": "tsup --watch",
-    "test:run": "vitest run",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
@@ -43,6 +45,7 @@
     "@types/node": "^20.19.25",
     "dotenv": "^16.6.1",
     "tsup": "^8.5.1",
+    "tsx": "^4.19.0",
     "typescript": "^5.9.3",
     "vitest": "^1.6.1"
   },
