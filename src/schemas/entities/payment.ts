@@ -1,6 +1,73 @@
 import { z } from 'zod'
 import { ListParamsSchema } from '../common'
 
+// ============================================================================
+// Enum Constants - Use these for autocomplete and validation
+// ============================================================================
+
+/** Valid payment statuses */
+export const PAYMENT_STATUSES = [
+  'APPROVING',
+  'PAID',
+  'VOID',
+  'SCHEDULED',
+  'FAILED',
+  'PENDING',
+  'UNDEFINED',
+] as const
+
+/** Valid disbursement types */
+export const PAYMENT_DISBURSEMENT_TYPES = [
+  'ACH',
+  'CHECK',
+  'RPPS',
+  'INTERNATIONAL',
+  'VCARD',
+  'WALLET',
+  'OFFLINE',
+  'UNDEFINED',
+] as const
+
+/** Valid disbursement statuses */
+export const PAYMENT_DISBURSEMENT_STATUSES = ['DONE', 'FAILED', 'IN_PROGRESS', 'UNDEFINED'] as const
+
+/** Valid funding account types */
+export const PAYMENT_FUNDING_ACCOUNT_TYPES = [
+  'BANK_ACCOUNT',
+  'CARD_ACCOUNT',
+  'AP_CARD',
+  'UNDEFINED',
+] as const
+
+/** Valid single payment statuses */
+export const PAYMENT_SINGLE_STATUSES = [
+  'CLEARED',
+  'VOID_PENDING',
+  'SCHEDULED',
+  'PAID',
+  'FAILED',
+  'UNDEFINED',
+] as const
+
+/** Fields that can be used for filtering payments */
+export const PAYMENT_FILTERABLE_FIELDS = [
+  'id',
+  'vendorId',
+  'status',
+  'disbursementType',
+  'processDate',
+  'amount',
+  'createdTime',
+  'updatedTime',
+] as const
+
+/** Fields that can be used for sorting payments */
+export const PAYMENT_SORTABLE_FIELDS = ['processDate', 'amount', 'createdTime', 'updatedTime'] as const
+
+// ============================================================================
+// Zod Schemas
+// ============================================================================
+
 export const PaymentStatusSchema = z.enum([
   'APPROVING',
   'PAID',
@@ -124,24 +191,43 @@ export const PaymentPurposeSchema = z.object({
 })
 
 export const PaymentSchema = z.object({
+  /** Unique identifier for the payment */
   id: z.string(),
+  /** Total payment amount */
   amount: z.number().optional(),
+  /** ID of the vendor being paid */
   vendorId: z.string().optional(),
+  /** Name of the vendor (read-only) */
   vendorName: z.string().optional(),
+  /** ID of the bill being paid (for single-bill payments) */
   billId: z.string().optional(),
+  /** Description or memo for the payment */
   description: z.string().optional(),
+  /** Date to process the payment in ISO 8601 format */
   processDate: z.string().optional(),
+  /** List of bills included in this payment */
   billPayments: z.array(PaymentBillPaymentSchema).optional(),
+  /** Source account for the payment */
   fundingAccount: PaymentFundingAccountSchema.optional(),
+  /** Payment processing options */
   processingOptions: PaymentProcessingOptionsSchema.optional(),
+  /** Current payment status */
   status: PaymentStatusSchema.optional(),
+  /** Type of disbursement (ACH, CHECK, etc.) */
   disbursementType: PaymentDisbursementTypeSchema.optional(),
+  /** Status of the disbursement */
   disbursementStatus: PaymentDisbursementStatusSchema.optional(),
+  /** Detailed disbursement information */
   disbursementInfo: PaymentDisbursementInfoSchema.optional(),
+  /** Information about voided payments */
   voidInfo: z.array(PaymentVoidInfoSchema).optional(),
+  /** Purpose of the payment */
   paymentPurpose: PaymentPurposeSchema.optional(),
+  /** Single payment status */
   singleStatus: PaymentSingleStatusSchema.optional(),
+  /** ISO 8601 timestamp when the payment was created */
   createdTime: z.string().optional(),
+  /** ISO 8601 timestamp when the payment was last updated */
   updatedTime: z.string().optional(),
 })
 
@@ -168,7 +254,10 @@ export const UpdatePaymentRequestSchema = z.object({
 
 export const PaymentListParamsSchema = ListParamsSchema
 
-// Infer types from schemas
+// ============================================================================
+// Type Inference
+// ============================================================================
+
 export type PaymentStatus = z.infer<typeof PaymentStatusSchema>
 export type PaymentDisbursementType = z.infer<typeof PaymentDisbursementTypeSchema>
 export type PaymentDisbursementStatus = z.infer<typeof PaymentDisbursementStatusSchema>
@@ -191,3 +280,9 @@ export type Payment = z.infer<typeof PaymentSchema>
 export type CreatePaymentRequest = z.infer<typeof CreatePaymentRequestSchema>
 export type UpdatePaymentRequest = z.infer<typeof UpdatePaymentRequestSchema>
 export type PaymentListParams = z.infer<typeof PaymentListParamsSchema>
+
+/** Type-safe filter field names for Payment */
+export type PaymentFilterField = (typeof PAYMENT_FILTERABLE_FIELDS)[number]
+
+/** Type-safe sort field names for Payment */
+export type PaymentSortField = (typeof PAYMENT_SORTABLE_FIELDS)[number]

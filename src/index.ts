@@ -1,6 +1,7 @@
 export { BillClient } from './client.ts'
 export * from './types/index.ts'
 export * from './utils/errors.ts'
+export * from './constants.ts'
 
 // Re-export resources for direct usage
 export { VendorResource } from './resources/vendor.ts'

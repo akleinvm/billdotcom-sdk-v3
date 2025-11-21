@@ -1,4 +1,3 @@
-import { type ZodType } from 'zod'
 import type { PaginatedResponse, ListParams, Filter } from '../types/common'
 import { makeRequest, type RequestConfig } from '../utils/request'
 
@@ -44,8 +43,6 @@ export abstract class BaseResource<
   TListParams extends ListParams = ListParams,
 > {
   protected abstract readonly endpoint: string
-  protected abstract readonly entitySchema: ZodType<TEntity>
-  protected abstract readonly listSchema: ZodType<PaginatedResponse<TEntity>>
 
   constructor(protected readonly getConfig: () => RequestConfig) {}
 
@@ -55,9 +52,6 @@ export abstract class BaseResource<
     const queryParams = new URLSearchParams()
 
     if (params?.max !== undefined) {
-      if (params.max < 1 || params.max > 100) {
-        throw new Error('max must be between 1 and 100')
-      }
       queryParams.set('max', String(params.max))
     }
     if (params?.page) {
@@ -77,75 +71,51 @@ export abstract class BaseResource<
     const queryString = queryParams.toString()
     const path = queryString ? `${this.endpoint}?${queryString}` : this.endpoint
 
-    return makeRequest<PaginatedResponse<TEntity>>(
-      config,
-      {
-        method: 'GET',
-        path,
-      },
-      this.listSchema
-    )
+    return makeRequest<PaginatedResponse<TEntity>>(config, {
+      method: 'GET',
+      path,
+    })
   }
 
   async get(id: string): Promise<TEntity> {
     const config = this.getConfig()
-    return makeRequest<TEntity>(
-      config,
-      {
-        method: 'GET',
-        path: `${this.endpoint}/${id}`,
-      },
-      this.entitySchema
-    )
+    return makeRequest<TEntity>(config, {
+      method: 'GET',
+      path: `${this.endpoint}/${id}`,
+    })
   }
 
   async create(data: TCreateRequest): Promise<TEntity> {
     const config = this.getConfig()
-    return makeRequest<TEntity>(
-      config,
-      {
-        method: 'POST',
-        path: this.endpoint,
-        body: data,
-      },
-      this.entitySchema
-    )
+    return makeRequest<TEntity>(config, {
+      method: 'POST',
+      path: this.endpoint,
+      body: data,
+    })
   }
 
   async update(id: string, data: TUpdateRequest): Promise<TEntity> {
     const config = this.getConfig()
-    return makeRequest<TEntity>(
-      config,
-      {
-        method: 'PATCH',
-        path: `${this.endpoint}/${id}`,
-        body: data,
-      },
-      this.entitySchema
-    )
+    return makeRequest<TEntity>(config, {
+      method: 'PATCH',
+      path: `${this.endpoint}/${id}`,
+      body: data,
+    })
   }
 
   async archive(id: string): Promise<TEntity> {
     const config = this.getConfig()
-    return makeRequest<TEntity>(
-      config,
-      {
-        method: 'POST',
-        path: `${this.endpoint}/${id}/archive`,
-      },
-      this.entitySchema
-    )
+    return makeRequest<TEntity>(config, {
+      method: 'POST',
+      path: `${this.endpoint}/${id}/archive`,
+    })
   }
 
   async restore(id: string): Promise<TEntity> {
     const config = this.getConfig()
-    return makeRequest<TEntity>(
-      config,
-      {
-        method: 'POST',
-        path: `${this.endpoint}/${id}/restore`,
-      },
-      this.entitySchema
-    )
+    return makeRequest<TEntity>(config, {
+      method: 'POST',
+      path: `${this.endpoint}/${id}/restore`,
+    })
   }
 }

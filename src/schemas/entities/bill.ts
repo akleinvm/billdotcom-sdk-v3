@@ -1,6 +1,39 @@
 import { z } from 'zod'
 import { ListParamsSchema } from '../common'
 
+// ============================================================================
+// Enum Constants - Use these for autocomplete and validation
+// ============================================================================
+
+/** Valid payment statuses for a bill */
+export const BILL_PAYMENT_STATUSES = ['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED', 'UNDEFINED'] as const
+
+/** Valid approval statuses for a bill */
+export const BILL_APPROVAL_STATUSES = ['UNASSIGNED', 'ASSIGNED', 'APPROVING', 'APPROVED', 'DENIED'] as const
+
+/** Valid approver statuses */
+export const APPROVER_STATUSES = ['WAITING', 'APPROVED', 'DENIED', 'REROUTED', 'UNDEFINED'] as const
+
+/** Fields that can be used for filtering bills */
+export const BILL_FILTERABLE_FIELDS = [
+  'id',
+  'archived',
+  'vendorId',
+  'amount',
+  'dueDate',
+  'paymentStatus',
+  'approvalStatus',
+  'createdTime',
+  'updatedTime',
+] as const
+
+/** Fields that can be used for sorting bills */
+export const BILL_SORTABLE_FIELDS = ['dueDate', 'amount', 'createdTime', 'updatedTime'] as const
+
+// ============================================================================
+// Zod Schemas
+// ============================================================================
+
 export const BillPaymentStatusSchema = z.enum(['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED', 'UNDEFINED'])
 
 export const BillApprovalStatusSchema = z.enum(['UNASSIGNED', 'ASSIGNED', 'APPROVING', 'APPROVED', 'DENIED'])
@@ -48,28 +81,51 @@ export const BillLineItemSchema = z.object({
 })
 
 export const BillSchema = z.object({
+  /** Unique identifier for the bill */
   id: z.string(),
+  /** Whether the bill is archived */
   archived: z.boolean(),
+  /** ID of the vendor this bill is from */
   vendorId: z.string().optional(),
+  /** Name of the vendor (read-only) */
   vendorName: z.string().optional(),
+  /** Total funding amount */
   fundingAmount: z.number().optional(),
+  /** Total bill amount */
   amount: z.number().optional(),
+  /** Amount already paid */
   paidAmount: z.number().optional(),
+  /** Amount still due */
   dueAmount: z.number().optional(),
+  /** Amount scheduled for payment */
   scheduledAmount: z.number().optional(),
+  /** Amount covered by credits */
   creditAmount: z.number(),
+  /** Exchange rate for foreign currency bills */
   exchangeRate: z.number().optional(),
+  /** Description or memo for the bill */
   description: z.string().optional(),
+  /** Due date in ISO 8601 format (e.g., "2024-01-31") */
   dueDate: z.string(),
+  /** Invoice information (number and date) */
   invoice: BillInvoiceSchema,
+  /** Line items on the bill */
   billLineItems: z.array(BillLineItemSchema),
+  /** Chart of account ID for payment source */
   payFromChartOfAccountId: z.string().optional(),
+  /** Current payment status */
   paymentStatus: BillPaymentStatusSchema,
+  /** Current approval status */
   approvalStatus: BillApprovalStatusSchema,
+  /** ISO 8601 timestamp when the bill was created */
   createdTime: z.string(),
+  /** ISO 8601 timestamp when the bill was last updated */
   updatedTime: z.string(),
+  /** Classification IDs for accounting */
   classifications: BillClassificationsSchema.optional(),
+  /** List of approvers and their statuses */
   approvers: z.array(BillApproverSchema).optional(),
+  /** Associated purchase order number */
   purchaseOrderNumber: z.string().optional(),
 })
 
@@ -101,7 +157,10 @@ export const UpdateBillRequestSchema = z.object({
 
 export const BillListParamsSchema = ListParamsSchema
 
-// Infer types from schemas
+// ============================================================================
+// Type Inference
+// ============================================================================
+
 export type BillPaymentStatus = z.infer<typeof BillPaymentStatusSchema>
 export type BillApprovalStatus = z.infer<typeof BillApprovalStatusSchema>
 export type ApproverStatus = z.infer<typeof ApproverStatusSchema>
@@ -115,3 +174,9 @@ export type Bill = z.infer<typeof BillSchema>
 export type CreateBillRequest = z.infer<typeof CreateBillRequestSchema>
 export type UpdateBillRequest = z.infer<typeof UpdateBillRequestSchema>
 export type BillListParams = z.infer<typeof BillListParamsSchema>
+
+/** Type-safe filter field names for Bill */
+export type BillFilterField = (typeof BILL_FILTERABLE_FIELDS)[number]
+
+/** Type-safe sort field names for Bill */
+export type BillSortField = (typeof BILL_SORTABLE_FIELDS)[number]

@@ -1,4 +1,3 @@
-import { type ZodType } from 'zod'
 import {
   BillApiError,
   AuthenticationError,
@@ -22,8 +21,7 @@ export interface RequestConfig {
 
 export async function makeRequest<T>(
   config: RequestConfig,
-  options: RequestOptions,
-  schema?: ZodType<T>
+  options: RequestOptions
 ): Promise<T> {
   const url = `${config.baseUrl}${options.path}`
 
@@ -102,18 +100,6 @@ export async function makeRequest<T>(
     const errorData = responseData as Record<string, unknown>
     const message = (errorData.message || errorData.error || 'API request failed') as string
     throw new BillApiError(message, response.status, 1, responseData)
-  }
-
-  // Validate response against schema if provided
-  if (schema) {
-    const result = schema.safeParse(responseData)
-    if (!result.success) {
-      throw new ValidationError(
-        `Invalid API response: ${result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')}`,
-        result.error.issues
-      )
-    }
-    return result.data
   }
 
   return responseData as T
