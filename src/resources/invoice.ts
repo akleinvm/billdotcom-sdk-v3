@@ -13,4 +13,5 @@ export class InvoiceResource extends BaseResource<
   InvoiceListParams
 > {
   protected readonly endpoint = '/v3/invoices'
+  protected readonly bulkResponseKey = 'invoices'
 }

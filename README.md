@@ -1,6 +1,14 @@
 # billdotcom-sdk-v3
 
-TypeScript SDK for the Bill.com V3 API.
+TypeScript SDK for the Bill.com V3 API with full type safety and developer guidance.
+
+## Features
+
+- **Full TypeScript support** with accurate type definitions
+- **Auto-complete friendly** - exported constants for all enum values
+- **Type-safe filters and sorts** - know exactly which fields are filterable/sortable
+- **JSDoc documentation** on all fields
+- **Zero client-side validation** - trust the server for validation, keep the SDK lightweight
 
 ## Installation
 
@@ -11,7 +19,11 @@ npm install billdotcom-sdk-v3
 ## Quick Start
 
 ```typescript
-import { BillClient } from 'billdotcom-sdk-v3'
+import {
+  BillClient,
+  VENDOR_ACCOUNT_TYPES,  // ['BUSINESS', 'PERSON', 'NONE', 'UNDEFINED']
+  BILL_PAYMENT_STATUSES, // ['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED', 'UNDEFINED']
+} from 'billdotcom-sdk-v3'
 
 const client = new BillClient({
   username: 'your-username',
@@ -28,9 +40,10 @@ await client.login()
 const vendors = await client.vendors.list()
 console.log(vendors.data)
 
-// Create a vendor
+// Create a vendor with type hints
 const vendor = await client.vendors.create({
   name: 'Acme Corp',
+  accountType: 'BUSINESS', // IDE shows valid options from VENDOR_ACCOUNT_TYPES
   email: 'contact@acme.com',
 })
 
@@ -69,26 +82,70 @@ The SDK provides access to the following Bill.com entities:
 ### Core Entities
 - `client.vendors` - Vendor management
 - `client.bills` - Bill management
+- `client.invoices` - Invoice management
+- `client.customers` - Customer management
+- `client.payments` - Payment management
+- `client.creditMemos` - Credit memo management
 
 ### Classification Entities
 - `client.chartOfAccounts` - Chart of accounts
 - `client.accountingClasses` - Accounting classes
+
+## Type-Safe Constants
+
+All enum values are exported as constants for autocomplete and validation:
+
+```typescript
+import {
+  // Vendor constants
+  VENDOR_ACCOUNT_TYPES,        // ['BUSINESS', 'PERSON', 'NONE', 'UNDEFINED']
+  VENDOR_PAY_BY_TYPES,         // ['ACH', 'CHECK', 'VIRTUAL_CARD', 'RPPS', 'UNDEFINED']
+  VENDOR_FILTERABLE_FIELDS,    // ['id', 'archived', 'name', ...]
+  VENDOR_SORTABLE_FIELDS,      // ['name', 'createdTime', 'updatedTime']
+
+  // Bill constants
+  BILL_PAYMENT_STATUSES,       // ['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED', 'UNDEFINED']
+  BILL_APPROVAL_STATUSES,      // ['UNASSIGNED', 'ASSIGNED', 'APPROVING', 'APPROVED', 'DENIED']
+  BILL_FILTERABLE_FIELDS,      // ['id', 'archived', 'vendorId', 'amount', ...]
+
+  // Invoice constants
+  INVOICE_STATUSES,            // ['OPEN', 'PARTIAL_PAYMENT', 'PAID', 'SCHEDULED', 'VOID', 'UNDEFINED']
+
+  // Payment constants
+  PAYMENT_STATUSES,            // ['APPROVING', 'PAID', 'VOID', 'SCHEDULED', 'FAILED', ...]
+  PAYMENT_DISBURSEMENT_TYPES,  // ['ACH', 'CHECK', 'RPPS', 'INTERNATIONAL', 'VCARD', ...]
+
+  // Chart of Account constants
+  ACCOUNT_TYPES,               // ['BANK', 'EXPENSE', 'INCOME', ...]
+
+  // Type-safe field types
+  type VendorFilterField,      // 'id' | 'archived' | 'name' | ...
+  type BillSortField,          // 'dueDate' | 'amount' | 'createdTime' | 'updatedTime'
+} from 'billdotcom-sdk-v3'
+```
 
 ## Resource Methods
 
 Most resources support the following operations:
 
 ```typescript
+import {
+  VENDOR_FILTERABLE_FIELDS, // Use for reference
+  type VendorFilterField,   // Type-safe field names
+} from 'billdotcom-sdk-v3'
+
 // List entities with optional pagination and filters
 const result = await client.vendors.list({
   max: 10,
   page: 'next-page-token', // optional, for pagination
   filters: [
     { field: 'archived', op: 'eq', value: false },
-    { field: 'name', op: 'eq', value: 'Acme' },
+    { field: 'name', op: 'sw', value: 'Acme' }, // starts with
   ],
   sort: [{ field: 'name', order: 'asc' }],
 })
+
+// Filter operators: eq, ne, gt, gte, lt, lte, sw (starts with), in, nin
 
 // Get a single entity by ID
 const vendor = await client.vendors.get('vendor-id')
@@ -96,6 +153,7 @@ const vendor = await client.vendors.get('vendor-id')
 // Create a new entity
 const newVendor = await client.vendors.create({
   name: 'New Vendor',
+  accountType: 'BUSINESS',
   email: 'vendor@example.com',
 })
 
@@ -114,33 +172,48 @@ await client.vendors.restore('vendor-id')
 ## Working with Bills
 
 ```typescript
+import { BILL_PAYMENT_STATUSES } from 'billdotcom-sdk-v3'
+
 // Create a bill
 const bill = await client.bills.create({
   vendorId: 'vendor-id',
-  invoiceDate: '2024-01-15',
   dueDate: '2024-02-15',
+  invoice: {
+    invoiceNumber: 'INV-001',
+    invoiceDate: '2024-01-15',
+  },
   billLineItems: [
     {
       amount: 100,
-      chartOfAccountId: 'account-id',
       description: 'Office supplies',
+      classifications: {
+        chartOfAccountId: 'account-id',
+      },
     },
   ],
+})
+
+// List bills by payment status
+const unpaidBills = await client.bills.list({
+  filters: [
+    { field: 'paymentStatus', op: 'eq', value: 'UNPAID' },
+  ],
+  sort: [{ field: 'dueDate', order: 'asc' }],
 })
 
 // Bulk create bills
 const bills = await client.bills.bulkCreate([
   {
     vendorId: 'vendor-id',
-    invoiceDate: '2024-01-20',
     dueDate: '2024-02-20',
-    billLineItems: [{ amount: 200, chartOfAccountId: 'account-id' }],
+    invoice: { invoiceNumber: 'INV-002', invoiceDate: '2024-01-20' },
+    billLineItems: [{ amount: 200 }],
   },
   {
     vendorId: 'vendor-id',
-    invoiceDate: '2024-01-21',
     dueDate: '2024-02-21',
-    billLineItems: [{ amount: 300, chartOfAccountId: 'account-id' }],
+    invoice: { invoiceNumber: 'INV-003', invoiceDate: '2024-01-21' },
+    billLineItems: [{ amount: 300 }],
   },
 ])
 ```
@@ -148,58 +221,66 @@ const bills = await client.bills.bulkCreate([
 ## Working with Invoices
 
 ```typescript
+import { INVOICE_STATUSES } from 'billdotcom-sdk-v3'
+
 // Create an invoice
 const invoice = await client.invoices.create({
-  customerId: 'customer-id',
+  invoiceNumber: 'INV-2024-001',
   invoiceDate: '2024-01-15',
   dueDate: '2024-02-15',
+  customer: { id: 'customer-id' },
   invoiceLineItems: [
     {
-      amount: 500,
-      chartOfAccountId: 'account-id',
+      price: 500,
+      quantity: 1,
       description: 'Consulting services',
+      classifications: {
+        chartOfAccountId: 'account-id',
+      },
     },
   ],
 })
 
-// Get payment link for invoice
-const { paymentLink } = await client.invoices.getPaymentLink(invoice.id)
+// List open invoices
+const openInvoices = await client.invoices.list({
+  filters: [
+    { field: 'status', op: 'eq', value: 'OPEN' },
+  ],
+  sort: [{ field: 'dueDate', order: 'asc' }],
+})
 ```
 
 ## Working with Payments
 
 ```typescript
+import { PAYMENT_STATUSES, PAYMENT_DISBURSEMENT_TYPES } from 'billdotcom-sdk-v3'
+
 // List payments
 const payments = await client.payments.list({
   filters: [
     { field: 'vendorId', op: 'eq', value: 'vendor-id' },
+    { field: 'status', op: 'eq', value: 'SCHEDULED' },
   ],
 })
 
-// Get payment options
-const options = await client.payments.getOptions({
-  vendorId: 'vendor-id',
-  billIds: ['bill-id-1', 'bill-id-2'],
-})
-
-// Create a payment (requires bank account setup)
+// Create a payment
 const payment = await client.payments.create({
   vendorId: 'vendor-id',
   processDate: '2024-02-01',
-  chartOfAccountId: 'bank-account-id',
-  billCredits: [
+  billPayments: [
     {
       billId: 'bill-id',
       amount: 100,
     },
   ],
+  fundingAccount: {
+    type: 'BANK_ACCOUNT',
+    id: 'bank-account-id',
+  },
 })
 
-// Cancel a payment
-await client.payments.cancel('payment-id')
-
-// Void a payment
-await client.payments.void('payment-id')
+// Get payment details
+const paymentDetails = await client.payments.get('payment-id')
 ```
 
 ## Error Handling

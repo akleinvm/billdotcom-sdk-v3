@@ -206,6 +206,52 @@ describe('CreditMemoResource', () => {
     })
   })
 
+  describe('createMultiple', () => {
+    it('should create multiple credit memos at once', async () => {
+      const today = new Date()
+
+      const creditMemos: CreateCreditMemoRequest[] = [
+        {
+          customerId: testCustomer.id,
+          creditDate: today.toISOString().split('T')[0],
+          referenceNumber: `CM-BULK-${Date.now()}-1`,
+          creditMemoLineItems: [
+            {
+              description: 'Bulk Credit 1',
+              price: 50,
+              quantity: 1,
+            },
+          ],
+        },
+        {
+          customerId: testCustomer.id,
+          creditDate: today.toISOString().split('T')[0],
+          referenceNumber: `CM-BULK-${Date.now()}-2`,
+          creditMemoLineItems: [
+            {
+              description: 'Bulk Credit 2',
+              price: 75,
+              quantity: 1,
+            },
+          ],
+        },
+      ]
+
+      const result = await client.creditMemos.createMultiple(creditMemos)
+
+      expect(result).toBeDefined()
+      expect(Array.isArray(result)).toBe(true)
+      expect(result.length).toBe(2)
+
+      result.forEach((creditMemo) => {
+        createdCreditMemoIds.push(creditMemo.id)
+        expect(creditMemo.id).toBeDefined()
+        expect(creditMemo.customerId).toBe(testCustomer.id)
+        expect(creditMemo.archived).toBe(false)
+      })
+    })
+  })
+
   describe('get', () => {
     it('should get credit memo by id', async () => {
       const creditMemo = await client.creditMemos.get(testCreditMemo.id)

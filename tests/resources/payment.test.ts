@@ -174,6 +174,47 @@ describe('PaymentResource', () => {
   //   })
   // })
 
+  // describe('createMultiple', () => {
+  //   it('should create multiple payments at once', async () => {
+  //     const payments = [
+  //       {
+  //         vendorId: testVendor.id,
+  //         processDate: new Date().toISOString().split('T')[0],
+  //         description: 'Test payment 1',
+  //         billPayments: [
+  //           {
+  //             billId: testBill.id,
+  //             amount: 50,
+  //           },
+  //         ],
+  //       },
+  //       {
+  //         vendorId: testVendor.id,
+  //         processDate: new Date().toISOString().split('T')[0],
+  //         description: 'Test payment 2',
+  //         billPayments: [
+  //           {
+  //             billId: testBill.id,
+  //             amount: 50,
+  //           },
+  //         ],
+  //       },
+  //     ]
+  //
+  //     const result = await client.payments.createMultiple(payments)
+  //
+  //     expect(result).toBeDefined()
+  //     expect(Array.isArray(result)).toBe(true)
+  //     expect(result.length).toBe(2)
+  //
+  //     result.forEach((payment) => {
+  //       createdPaymentIds.push(payment.id)
+  //       expect(payment.id).toBeDefined()
+  //       expect(payment.vendorId).toBe(testVendor.id)
+  //     })
+  //   })
+  // })
+
   describe('payment operations', () => {
     // Test that we can at least access the payment resource without errors
     it('should access payment resource without errors', async () => {

@@ -192,6 +192,114 @@ describe('VendorResource', () => {
         })
     })
 
+    describe('createMultiple', () => {
+        it('should create multiple vendors at once', async () => {
+            const vendors: CreateVendorRequest[] = [
+                {
+                    name: `Test Vendor Bulk ${Date.now()}-1`,
+                    accountType: 'BUSINESS',
+                    address: {
+                        line1: '200 Bulk St',
+                        city: 'San Francisco',
+                        stateOrProvince: 'CA',
+                        zipOrPostalCode: '94105',
+                        country: 'US',
+                    },
+                },
+                {
+                    name: `Test Vendor Bulk ${Date.now()}-2`,
+                    accountType: 'BUSINESS',
+                    address: {
+                        line1: '201 Bulk St',
+                        city: 'San Francisco',
+                        stateOrProvince: 'CA',
+                        zipOrPostalCode: '94105',
+                        country: 'US',
+                    },
+                },
+            ]
+
+            const result = await client.vendors.createMultiple(vendors)
+
+            expect(result).toBeDefined()
+            expect(Array.isArray(result)).toBe(true)
+            expect(result.length).toBe(2)
+
+            result.forEach((vendor) => {
+                createdVendorIds.push(vendor.id)
+                expect(vendor.id).toBeDefined()
+                expect(vendor.archived).toBe(false)
+            })
+        })
+
+        it('should create a single vendor via createMultiple', async () => {
+            const vendors: CreateVendorRequest[] = [
+                {
+                    name: `Test Vendor Single ${Date.now()}`,
+                    accountType: 'BUSINESS',
+                    address: {
+                        line1: '300 Single St',
+                        city: 'San Francisco',
+                        stateOrProvince: 'CA',
+                        zipOrPostalCode: '94105',
+                        country: 'US',
+                    },
+                },
+            ]
+
+            const result = await client.vendors.createMultiple(vendors)
+
+            expect(result).toBeDefined()
+            expect(Array.isArray(result)).toBe(true)
+            expect(result.length).toBe(1)
+            createdVendorIds.push(result[0].id)
+            expect(result[0].id).toBeDefined()
+        })
+
+        it('should create vendors with different contact info', async () => {
+            const vendors: CreateVendorRequest[] = [
+                {
+                    name: `Test Vendor Email Only ${Date.now()}`,
+                    accountType: 'BUSINESS',
+                    email: `vendor-email-${Date.now()}@example.com`,
+                    address: {
+                        line1: '301 Email St',
+                        city: 'San Francisco',
+                        stateOrProvince: 'CA',
+                        zipOrPostalCode: '94105',
+                        country: 'US',
+                    },
+                },
+                {
+                    name: `Test Vendor Full Contact ${Date.now()}`,
+                    accountType: 'BUSINESS',
+                    email: `vendor-full-${Date.now()}@example.com`,
+                    phone: '555-0200',
+                    address: {
+                        line1: '302 Full St',
+                        city: 'Los Angeles',
+                        stateOrProvince: 'CA',
+                        zipOrPostalCode: '90001',
+                        country: 'US',
+                    },
+                },
+            ]
+
+            const result = await client.vendors.createMultiple(vendors)
+
+            expect(result).toBeDefined()
+            expect(result.length).toBe(2)
+
+            result.forEach((vendor) => {
+                createdVendorIds.push(vendor.id)
+            })
+
+            expect(result[0].email).toContain('vendor-email')
+            expect(result[1].phone).toBe('555-0200')
+            expect(result[1].address?.city).toBe('Los Angeles')
+        })
+    })
+
     describe('get', () => {
         it('should get vendor by id', async () => {
             const vendor = await client.vendors.get(testVendor.id)

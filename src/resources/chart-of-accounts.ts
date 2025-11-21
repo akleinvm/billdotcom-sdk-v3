@@ -13,4 +13,5 @@ export class ChartOfAccountsResource extends BaseResource<
   ChartOfAccountListParams
 > {
   protected readonly endpoint = '/v3/classifications/chart-of-accounts'
+  protected readonly bulkResponseKey = 'chartOfAccounts'
 }

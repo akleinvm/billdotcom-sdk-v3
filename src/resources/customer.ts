@@ -13,4 +13,5 @@ export class CustomerResource extends BaseResource<
   CustomerListParams
 > {
   protected readonly endpoint = '/v3/customers'
+  protected readonly bulkResponseKey = 'customers'
 }

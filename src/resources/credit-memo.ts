@@ -13,4 +13,5 @@ export class CreditMemoResource extends BaseResource<
   CreditMemoListParams
 > {
   protected readonly endpoint = '/v3/credit-memos'
+  protected readonly bulkResponseKey = 'creditMemos'
 }

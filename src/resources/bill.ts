@@ -5,7 +5,7 @@ import {
   type UpdateBillRequest,
   type BillListParams,
 } from '../types'
-import { makeRequest, type RequestConfig } from '../utils/request'
+import { type RequestConfig } from '../utils/request'
 
 export class BillResource extends BaseResource<
   Bill,
@@ -14,17 +14,9 @@ export class BillResource extends BaseResource<
   BillListParams
 > {
   protected readonly endpoint = '/v3/bills'
+  protected readonly bulkResponseKey = 'bills'
 
   constructor(getConfig: () => RequestConfig) {
     super(getConfig)
-  }
-
-  async bulkCreate(bills: CreateBillRequest[]): Promise<Bill[]> {
-    const config = this.getConfig()
-    return makeRequest<Bill[]>(config, {
-      method: 'POST',
-      path: `${this.endpoint}/bulk`,
-      body: bills,
-    })
   }
 }

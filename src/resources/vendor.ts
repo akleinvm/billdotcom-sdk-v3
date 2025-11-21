@@ -13,4 +13,5 @@ export class VendorResource extends BaseResource<
   VendorListParams
 > {
   protected readonly endpoint = '/v3/vendors'
+  protected readonly bulkResponseKey = 'vendors'
 }

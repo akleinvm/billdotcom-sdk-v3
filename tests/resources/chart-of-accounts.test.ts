@@ -152,6 +152,39 @@ describe('ChartOfAccountsResource', () => {
     })
   })
 
+  describe('createMultiple', () => {
+    it('should create multiple chart of accounts at once', async () => {
+      const accounts: CreateChartOfAccountRequest[] = [
+        {
+          name: `Test Account Bulk ${Date.now()}-1`,
+          account: {
+            type: 'EXPENSE',
+            number: `${Date.now()}`.slice(-6),
+          },
+        },
+        {
+          name: `Test Account Bulk ${Date.now()}-2`,
+          account: {
+            type: 'EXPENSE',
+            number: `${Date.now() + 1}`.slice(-6),
+          },
+        },
+      ]
+
+      const result = await client.chartOfAccounts.createMultiple(accounts)
+
+      expect(result).toBeDefined()
+      expect(Array.isArray(result)).toBe(true)
+      expect(result.length).toBe(2)
+
+      result.forEach((account) => {
+        createdAccountIds.push(account.id)
+        expect(account.id).toBeDefined()
+        expect(account.archived).toBe(false)
+      })
+    })
+  })
+
   describe('get', () => {
     it('should get chart of account by id', async () => {
       const account = await client.chartOfAccounts.get(testAccount.id)

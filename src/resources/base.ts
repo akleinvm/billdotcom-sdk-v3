@@ -43,6 +43,7 @@ export abstract class BaseResource<
   TListParams extends ListParams = ListParams,
 > {
   protected abstract readonly endpoint: string
+  protected abstract readonly bulkResponseKey: string
 
   constructor(protected readonly getConfig: () => RequestConfig) {}
 
@@ -92,6 +93,20 @@ export abstract class BaseResource<
       path: this.endpoint,
       body: data,
     })
+  }
+
+  async createMultiple(data: TCreateRequest[]): Promise<TEntity[]> {
+    const config = this.getConfig()
+    const response = await makeRequest<TEntity[] | Record<string, TEntity[]>>(config, {
+      method: 'POST',
+      path: `${this.endpoint}/bulk`,
+      body: data,
+    })
+    // Handle both plain array responses and wrapped responses
+    if (Array.isArray(response)) {
+      return response
+    }
+    return response[this.bulkResponseKey] as TEntity[]
   }
 
   async update(id: string, data: TUpdateRequest): Promise<TEntity> {

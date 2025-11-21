@@ -358,7 +358,7 @@ describe('BillResource', () => {
     })
   })
 
-  describe('bulkCreate', () => {
+  describe('createMultiple', () => {
     it('should create multiple bills at once', async () => {
       const bills: CreateBillRequest[] = [
         {
@@ -395,7 +395,7 @@ describe('BillResource', () => {
         },
       ]
 
-      const result = await client.bills.bulkCreate(bills)
+      const result = await client.bills.createMultiple(bills)
 
       expect(result).toBeDefined()
       expect(Array.isArray(result)).toBe(true)

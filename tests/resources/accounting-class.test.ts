@@ -108,6 +108,33 @@ describe('AccountingClassResource', () => {
     })
   })
 
+  describe('createMultiple', () => {
+    it('should create multiple accounting classes at once', async () => {
+      const classes: CreateAccountingClassRequest[] = [
+        {
+          name: `Test Class Bulk ${Date.now()}-1`,
+          description: 'Bulk class 1',
+        },
+        {
+          name: `Test Class Bulk ${Date.now()}-2`,
+          description: 'Bulk class 2',
+        },
+      ]
+
+      const result = await client.accountingClasses.createMultiple(classes)
+
+      expect(result).toBeDefined()
+      expect(Array.isArray(result)).toBe(true)
+      expect(result.length).toBe(2)
+
+      result.forEach((cls) => {
+        createdClassIds.push(cls.id)
+        expect(cls.id).toBeDefined()
+        expect(cls.archived).toBe(false)
+      })
+    })
+  })
+
   describe('get', () => {
     it('should get accounting class by id', async () => {
       const cls = await client.accountingClasses.get(testClass.id)

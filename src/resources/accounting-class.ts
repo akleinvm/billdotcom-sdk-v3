@@ -13,4 +13,5 @@ export class AccountingClassResource extends BaseResource<
   AccountingClassListParams
 > {
   protected readonly endpoint = '/v3/classifications/accounting-classes'
+  protected readonly bulkResponseKey = 'accountingClasses'
 }

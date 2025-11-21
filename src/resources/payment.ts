@@ -13,4 +13,5 @@ export class PaymentResource extends BaseResource<
   PaymentListParams
 > {
   protected readonly endpoint = '/v3/payments'
+  protected readonly bulkResponseKey = 'payments'
 }
