@@ -28,10 +28,10 @@ describe('InvoiceResource', () => {
     dueDate.setDate(dueDate.getDate() + 30)
 
     testInvoice = await client.invoices.create({
-      invoiceNumber: `INV-TEST-${Date.now()}`,
+      invoiceNumber: `INV-${Date.now().toString(36)}`,
       invoiceDate: today.toISOString().split('T')[0],
       dueDate: dueDate.toISOString().split('T')[0],
-      customerId: testCustomer.id,
+      customer: { id: testCustomer.id },
       invoiceLineItems: [
         {
           description: 'Test Service',
@@ -111,10 +111,10 @@ describe('InvoiceResource', () => {
       dueDate.setDate(dueDate.getDate() + 30)
 
       const invoiceData: CreateInvoiceRequest = {
-        invoiceNumber: `INV-MIN-${Date.now()}`,
+        invoiceNumber: `INV-${Date.now().toString(36)}`,
         invoiceDate: today.toISOString().split('T')[0],
         dueDate: dueDate.toISOString().split('T')[0],
-        customerId: testCustomer.id,
+        customer: { id: testCustomer.id },
         invoiceLineItems: [
           {
             description: 'Basic Service',
@@ -140,10 +140,10 @@ describe('InvoiceResource', () => {
       dueDate.setDate(dueDate.getDate() + 30)
 
       const invoiceData: CreateInvoiceRequest = {
-        invoiceNumber: `INV-MULTI-${Date.now()}`,
+        invoiceNumber: `INV-${Date.now().toString(36)}`,
         invoiceDate: today.toISOString().split('T')[0],
         dueDate: dueDate.toISOString().split('T')[0],
-        customerId: testCustomer.id,
+        customer: { id: testCustomer.id },
         invoiceLineItems: [
           {
             description: 'Service A',
@@ -172,10 +172,10 @@ describe('InvoiceResource', () => {
       dueDate.setDate(dueDate.getDate() + 30)
 
       const invoiceData: CreateInvoiceRequest = {
-        invoiceNumber: `INV-CARD-${Date.now()}`,
+        invoiceNumber: `INV-${Date.now().toString(36)}`,
         invoiceDate: today.toISOString().split('T')[0],
         dueDate: dueDate.toISOString().split('T')[0],
-        customerId: testCustomer.id,
+        customer: { id: testCustomer.id },
         invoiceLineItems: [
           {
             description: 'Premium Service',
@@ -184,6 +184,9 @@ describe('InvoiceResource', () => {
           },
         ],
         enableCardPayment: true,
+        convenienceFee: {
+          percentage: 2.5,
+        },
       }
 
       const invoice = await client.invoices.create(invoiceData)
@@ -214,10 +217,10 @@ describe('InvoiceResource', () => {
       dueDate.setDate(dueDate.getDate() + 30)
 
       const created = await client.invoices.create({
-        invoiceNumber: `INV-UPD-${Date.now()}`,
+        invoiceNumber: `INV-${Date.now().toString(36)}`,
         invoiceDate: today.toISOString().split('T')[0],
         dueDate: dueDate.toISOString().split('T')[0],
-        customerId: testCustomer.id,
+        customer: { id: testCustomer.id },
         invoiceLineItems: [
           {
             description: 'Test Service',
@@ -228,7 +231,7 @@ describe('InvoiceResource', () => {
       })
       createdInvoiceIds.push(created.id)
 
-      const newInvoiceNumber = `INV-UPDATED-${Date.now()}`
+      const newInvoiceNumber = `INV-${Date.now().toString(36)}`
       const updated = await client.invoices.update(created.id, {
         invoiceNumber: newInvoiceNumber,
       })
@@ -243,10 +246,10 @@ describe('InvoiceResource', () => {
       dueDate.setDate(dueDate.getDate() + 30)
 
       const created = await client.invoices.create({
-        invoiceNumber: `INV-DUE-${Date.now()}`,
+        invoiceNumber: `INV-${Date.now().toString(36)}`,
         invoiceDate: today.toISOString().split('T')[0],
         dueDate: dueDate.toISOString().split('T')[0],
-        customerId: testCustomer.id,
+        customer: { id: testCustomer.id },
         invoiceLineItems: [
           {
             description: 'Test Service',
@@ -275,10 +278,10 @@ describe('InvoiceResource', () => {
       dueDate.setDate(dueDate.getDate() + 30)
 
       const created = await client.invoices.create({
-        invoiceNumber: `INV-ARCH-${Date.now()}`,
+        invoiceNumber: `INV-${Date.now().toString(36)}`,
         invoiceDate: today.toISOString().split('T')[0],
         dueDate: dueDate.toISOString().split('T')[0],
-        customerId: testCustomer.id,
+        customer: { id: testCustomer.id },
         invoiceLineItems: [
           {
             description: 'Test Service',
@@ -299,10 +302,10 @@ describe('InvoiceResource', () => {
       dueDate.setDate(dueDate.getDate() + 30)
 
       const created = await client.invoices.create({
-        invoiceNumber: `INV-REST-${Date.now()}`,
+        invoiceNumber: `INV-${Date.now().toString(36)}`,
         invoiceDate: today.toISOString().split('T')[0],
         dueDate: dueDate.toISOString().split('T')[0],
-        customerId: testCustomer.id,
+        customer: { id: testCustomer.id },
         invoiceLineItems: [
           {
             description: 'Test Service',

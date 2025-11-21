@@ -1,6 +1,41 @@
 import { type ZodType } from 'zod'
-import type { PaginatedResponse, ListParams } from '../types/common'
+import type { PaginatedResponse, ListParams, Filter } from '../types/common'
 import { makeRequest, type RequestConfig } from '../utils/request'
+
+/**
+ * Check if a value should be quoted in the filter string
+ * Quotes are needed for: date-time values, string values with sw operator, in/nin values
+ */
+function shouldQuoteValue(value: string | number | boolean): boolean {
+  if (typeof value !== 'string') return false
+  // Check for ISO 8601 date-time format
+  const isoDatePattern = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2})?/
+  return isoDatePattern.test(value)
+}
+
+/**
+ * Format a filter into the query string format
+ */
+function formatFilter(filter: Filter): string {
+  if (filter.op === 'in' || filter.op === 'nin') {
+    // Array operators: format as quoted comma-separated string
+    return `${filter.field}:${filter.op}:"${filter.value.join(',')}"`
+  }
+
+  // At this point, filter is ScalarFilter
+  const scalarFilter = filter as { field: string; op: string; value: string | number | boolean }
+  const value = scalarFilter.value
+
+  // Quote string values for sw operator, or date-time values
+  if (filter.op === 'sw' && typeof value === 'string') {
+    return `${filter.field}:${filter.op}:"${value}"`
+  }
+  if (shouldQuoteValue(value)) {
+    return `${filter.field}:${filter.op}:"${value}"`
+  }
+
+  return `${filter.field}:${filter.op}:${value}`
+}
 
 export abstract class BaseResource<
   TEntity,
@@ -20,6 +55,9 @@ export abstract class BaseResource<
     const queryParams = new URLSearchParams()
 
     if (params?.max !== undefined) {
+      if (params.max < 1 || params.max > 100) {
+        throw new Error('max must be between 1 and 100')
+      }
       queryParams.set('max', String(params.max))
     }
     if (params?.page) {
@@ -32,9 +70,7 @@ export abstract class BaseResource<
       queryParams.set('sort', sortString)
     }
     if (params?.filters && params.filters.length > 0) {
-      const filterString = params.filters
-        .map((f) => `${f.field}:${f.op}:${f.value}`)
-        .join(',')
+      const filterString = params.filters.map(formatFilter).join(',')
       queryParams.set('filters', filterString)
     }
 

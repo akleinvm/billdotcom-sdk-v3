@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ListParamsSchema } from '../common'
 
 export const BillPaymentStatusSchema = z.enum(['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED', 'UNDEFINED'])
 
@@ -98,20 +99,7 @@ export const UpdateBillRequestSchema = z.object({
   billApprovals: z.boolean().optional(),
 })
 
-export const BillListParamsSchema = z.object({
-  max: z.number().optional(),
-  page: z.string().optional(),
-  filters: z
-    .array(
-      z.object({
-        field: z.string(),
-        op: z.string(),
-        value: z.unknown(),
-      })
-    )
-    .optional(),
-  sort: z.array(z.object({ field: z.string(), order: z.enum(['asc', 'desc']) })).optional(),
-})
+export const BillListParamsSchema = ListParamsSchema
 
 // Infer types from schemas
 export type BillPaymentStatus = z.infer<typeof BillPaymentStatusSchema>

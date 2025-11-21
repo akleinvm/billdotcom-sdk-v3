@@ -19,13 +19,20 @@ describe('PaymentResource', () => {
 
     // Get an income account for bills
     const accounts = await client.chartOfAccounts.list({ max: 50 })
-    incomeAccount = accounts.results.find((a) => a.accountType === 'INCOME')
+    incomeAccount = accounts.results.find((a) => a.account.type === 'INCOME')
 
     // Create a test vendor
     testVendor = await client.vendors.create({
       name: `Test Payment Vendor ${Date.now()}`,
       email: 'payment-vendor@example.com',
       accountType: 'BUSINESS',
+      address: {
+        line1: '123 Payment St',
+        city: 'San Francisco',
+        stateOrProvince: 'CA',
+        zipOrPostalCode: '94105',
+        country: 'US',
+      },
     })
     createdVendorIds.push(testVendor.id)
 
@@ -36,14 +43,18 @@ describe('PaymentResource', () => {
 
     testBill = await client.bills.create({
       vendorId: testVendor.id,
-      invoiceNumber: `BILL-PAY-${Date.now()}`,
-      invoiceDate: today.toISOString().split('T')[0],
+      invoice: {
+        invoiceNumber: `BP-${Date.now().toString(36)}`,
+        invoiceDate: today.toISOString().split('T')[0],
+      },
       dueDate: dueDate.toISOString().split('T')[0],
       billLineItems: [
         {
           description: 'Test bill for payment',
           amount: 100,
-          chartOfAccountId: incomeAccount?.id,
+          classifications: {
+            chartOfAccountId: incomeAccount?.id,
+          },
         },
       ],
     })
@@ -102,12 +113,12 @@ describe('PaymentResource', () => {
     it('should filter payments by status', async () => {
       const result = await client.payments.list({
         filters: [
-          { field: 'status', op: 'in', value: ['SCHEDULED', 'PAID', 'PENDING'] },
+          { field: 'status', op: 'eq', value: 'PAID' },
         ],
       })
       expect(result).toBeDefined()
       result.results.forEach((payment) => {
-        expect(['SCHEDULED', 'PAID', 'PENDING']).toContain(payment.status)
+        expect(payment.status).toBe('PAID')
       })
     })
   })

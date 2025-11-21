@@ -67,6 +67,7 @@ describe('CustomerResource', () => {
     it('should create a customer with minimal fields', async () => {
       const customerData: CreateCustomerRequest = {
         name: `Test Customer Create ${Date.now()}`,
+        email: `test-create-${Date.now()}@example.com`,
       }
 
       const customer = await client.customers.create(customerData)
@@ -98,6 +99,7 @@ describe('CustomerResource', () => {
     it('should create a customer with contact information', async () => {
       const customerData: CreateCustomerRequest = {
         name: `Test Customer Contact ${Date.now()}`,
+        email: `test-contact-${Date.now()}@example.com`,
         contact: {
           firstName: 'John',
           lastName: 'Doe',
@@ -116,6 +118,7 @@ describe('CustomerResource', () => {
     it('should create a customer with billing address', async () => {
       const customerData: CreateCustomerRequest = {
         name: `Test Customer Address ${Date.now()}`,
+        email: `test-address-${Date.now()}@example.com`,
         billingAddress: {
           line1: '123 Main St',
           city: 'San Francisco',
@@ -137,6 +140,7 @@ describe('CustomerResource', () => {
     it('should create a business account type customer', async () => {
       const customerData: CreateCustomerRequest = {
         name: `Test Business Customer ${Date.now()}`,
+        email: `test-business-${Date.now()}@example.com`,
         accountType: 'BUSINESS',
         companyName: 'Test Company Inc',
       }
@@ -167,6 +171,7 @@ describe('CustomerResource', () => {
     it('should update customer name', async () => {
       const created = await client.customers.create({
         name: `Test Customer Update ${Date.now()}`,
+        email: `test-update-${Date.now()}@example.com`,
       })
       createdCustomerIds.push(created.id)
 
@@ -198,6 +203,7 @@ describe('CustomerResource', () => {
     it('should update customer description', async () => {
       const created = await client.customers.create({
         name: `Test Customer Desc Update ${Date.now()}`,
+        email: `test-desc-update-${Date.now()}@example.com`,
       })
       createdCustomerIds.push(created.id)
 
@@ -215,6 +221,7 @@ describe('CustomerResource', () => {
     it('should archive a customer', async () => {
       const created = await client.customers.create({
         name: `Test Customer Archive ${Date.now()}`,
+        email: `test-archive-${Date.now()}@example.com`,
       })
 
       const archived = await client.customers.archive(created.id)
@@ -225,6 +232,7 @@ describe('CustomerResource', () => {
     it('should restore an archived customer', async () => {
       const created = await client.customers.create({
         name: `Test Customer Restore ${Date.now()}`,
+        email: `test-restore-${Date.now()}@example.com`,
       })
       createdCustomerIds.push(created.id)
 

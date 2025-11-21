@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ListParamsSchema } from '../common'
 
 export const VendorAccountTypeSchema = z.enum(['BUSINESS', 'PERSON', 'NONE', 'UNDEFINED'])
 
@@ -37,7 +38,7 @@ export const VendorVirtualCardStatusSchema = z.enum([
 
 export const VendorPayByTypeSchema = z.enum(['ACH', 'CHECK', 'VIRTUAL_CARD', 'RPPS', 'UNDEFINED'])
 
-export const VendorPayBySubTypeSchema = z.enum(['MULTIPLE', 'LOCAL', 'WIRE'])
+export const VendorPayBySubTypeSchema = z.enum(['MULTIPLE', 'LOCAL', 'WIRE', 'UNDEFINED', 'NONE'])
 
 export const VendorTaxIdTypeSchema = z.enum(['SSN', 'EIN', 'UNDEFINED'])
 
@@ -66,7 +67,7 @@ export const VendorPaymentInformationSchema = z.object({
   email: z.string().optional(),
   lastPaymentDate: z.string().optional(),
   payByType: VendorPayByTypeSchema.optional(),
-  payBySubType: VendorPayBySubTypeSchema.optional(),
+  payBySubType: VendorPayBySubTypeSchema.nullable().optional(),
   bankAccount: VendorBankAccountSchema.optional(),
   virtualCard: VendorVirtualCardSchema.optional(),
   paymentPurpose: VendorPaymentPurposeSchema.optional(),
@@ -170,20 +171,7 @@ export const UpdateVendorRequestSchema = z.object({
     .optional(),
 })
 
-export const VendorListParamsSchema = z.object({
-  max: z.number().optional(),
-  page: z.string().optional(),
-  filters: z
-    .array(
-      z.object({
-        field: z.string(),
-        op: z.string(),
-        value: z.unknown(),
-      })
-    )
-    .optional(),
-  sort: z.array(z.object({ field: z.string(), order: z.enum(['asc', 'desc']) })).optional(),
-})
+export const VendorListParamsSchema = ListParamsSchema
 
 // Infer types from schemas
 export type VendorAccountType = z.infer<typeof VendorAccountTypeSchema>

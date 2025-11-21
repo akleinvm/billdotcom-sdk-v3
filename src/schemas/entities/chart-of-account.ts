@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ListParamsSchema } from '../common'
 
 export const AccountTypeSchema = z.enum([
   'UNSPECIFIED',
@@ -56,20 +57,7 @@ export const UpdateChartOfAccountRequestSchema = z.object({
     .optional(),
 })
 
-export const ChartOfAccountListParamsSchema = z.object({
-  max: z.number().optional(),
-  page: z.string().optional(),
-  filters: z
-    .array(
-      z.object({
-        field: z.string(),
-        op: z.string(),
-        value: z.unknown(),
-      })
-    )
-    .optional(),
-  sort: z.array(z.object({ field: z.string(), order: z.enum(['asc', 'desc']) })).optional(),
-})
+export const ChartOfAccountListParamsSchema = ListParamsSchema
 
 // Infer types from schemas
 export type AccountType = z.infer<typeof AccountTypeSchema>

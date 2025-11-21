@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ListParamsSchema } from '../common'
 
 export const CustomerAccountTypeSchema = z.enum(['BUSINESS', 'PERSON', 'NONE'])
 
@@ -74,20 +75,7 @@ export const UpdateCustomerRequestSchema = z.object({
   shippingAddress: CustomerAddressSchema.optional(),
 })
 
-export const CustomerListParamsSchema = z.object({
-  max: z.number().optional(),
-  page: z.string().optional(),
-  filters: z
-    .array(
-      z.object({
-        field: z.string(),
-        op: z.string(),
-        value: z.unknown(),
-      })
-    )
-    .optional(),
-  sort: z.array(z.object({ field: z.string(), order: z.enum(['asc', 'desc']) })).optional(),
-})
+export const CustomerListParamsSchema = ListParamsSchema
 
 // Infer types from schemas
 export type CustomerAccountType = z.infer<typeof CustomerAccountTypeSchema>

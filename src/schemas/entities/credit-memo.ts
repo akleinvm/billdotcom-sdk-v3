@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ListParamsSchema } from '../common'
 
 export const CreditMemoStatusSchema = z.enum([
   'NOT_APPLIED',
@@ -82,20 +83,7 @@ export const UpdateCreditMemoRequestSchema = z.object({
   classifications: CreditMemoClassificationsSchema.optional(),
 })
 
-export const CreditMemoListParamsSchema = z.object({
-  max: z.number().optional(),
-  page: z.string().optional(),
-  filters: z
-    .array(
-      z.object({
-        field: z.string(),
-        op: z.string(),
-        value: z.unknown(),
-      })
-    )
-    .optional(),
-  sort: z.array(z.object({ field: z.string(), order: z.enum(['asc', 'desc']) })).optional(),
-})
+export const CreditMemoListParamsSchema = ListParamsSchema
 
 // Infer types from schemas
 export type CreditMemoStatus = z.infer<typeof CreditMemoStatusSchema>

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ListParamsSchema } from '../common'
 
 export const PaymentStatusSchema = z.enum([
   'APPROVING',
@@ -165,20 +166,7 @@ export const UpdatePaymentRequestSchema = z.object({
   paymentPurpose: PaymentPurposeSchema.optional(),
 })
 
-export const PaymentListParamsSchema = z.object({
-  max: z.number().optional(),
-  page: z.string().optional(),
-  filters: z
-    .array(
-      z.object({
-        field: z.string(),
-        op: z.string(),
-        value: z.unknown(),
-      })
-    )
-    .optional(),
-  sort: z.array(z.object({ field: z.string(), order: z.enum(['asc', 'desc']) })).optional(),
-})
+export const PaymentListParamsSchema = ListParamsSchema
 
 // Infer types from schemas
 export type PaymentStatus = z.infer<typeof PaymentStatusSchema>

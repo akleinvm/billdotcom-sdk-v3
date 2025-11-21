@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ListParamsSchema } from '../common'
 
 export const AccountingClassSchema = z.object({
   id: z.string(),
@@ -25,20 +26,7 @@ export const UpdateAccountingClassRequestSchema = z.object({
   parentId: z.string().optional(),
 })
 
-export const AccountingClassListParamsSchema = z.object({
-  max: z.number().optional(),
-  page: z.string().optional(),
-  filters: z
-    .array(
-      z.object({
-        field: z.string(),
-        op: z.string(),
-        value: z.unknown(),
-      })
-    )
-    .optional(),
-  sort: z.array(z.object({ field: z.string(), order: z.enum(['asc', 'desc']) })).optional(),
-})
+export const AccountingClassListParamsSchema = ListParamsSchema
 
 // Infer types from schemas
 export type AccountingClass = z.infer<typeof AccountingClassSchema>

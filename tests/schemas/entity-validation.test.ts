@@ -47,13 +47,13 @@ describe('Entity Schema Validation', () => {
 
     it('should have all required fields defined', () => {
       const requiredFields = ['id', 'archived', 'name', 'accountType', 'createdTime', 'updatedTime']
-      const schemaShape = VendorSchema._def.shape()
+      const schemaShape = VendorSchema.shape
 
       for (const field of requiredFields) {
         expect(schemaShape).toHaveProperty(field)
 
         // Check that it's not optional
-        const fieldSchema = schemaShape[field]
+        const fieldSchema = schemaShape[field as keyof typeof schemaShape]
         const isOptional = fieldSchema instanceof z.ZodOptional
         expect(isOptional, `Field '${field}' should be required`).toBe(false)
       }
@@ -111,8 +111,8 @@ describe('Entity Schema Validation', () => {
     }, 30000)
 
     it('should have all required fields defined', () => {
-      const requiredFields = ['id', 'archived', 'vendorId', 'amount', 'createdTime', 'updatedTime']
-      const schemaShape = BillSchema._def.shape()
+      const requiredFields = ['id', 'archived', 'creditAmount', 'dueDate', 'createdTime', 'updatedTime']
+      const schemaShape = BillSchema.shape
 
       for (const field of requiredFields) {
         expect(schemaShape).toHaveProperty(field)
@@ -159,8 +159,8 @@ describe('Entity Schema Validation', () => {
     }, 30000)
 
     it('should have all required fields defined', () => {
-      const requiredFields = ['id', 'archived', 'name', 'accountType', 'createdTime', 'updatedTime']
-      const schemaShape = ChartOfAccountSchema._def.shape()
+      const requiredFields = ['id', 'archived', 'name', 'account', 'createdTime', 'updatedTime']
+      const schemaShape = ChartOfAccountSchema.shape
 
       for (const field of requiredFields) {
         expect(schemaShape).toHaveProperty(field)
@@ -194,7 +194,7 @@ describe('Entity Schema Validation', () => {
 
     it('should have all required fields defined', () => {
       const requiredFields = ['id', 'archived', 'name', 'createdTime', 'updatedTime']
-      const schemaShape = AccountingClassSchema._def.shape()
+      const schemaShape = AccountingClassSchema.shape
 
       for (const field of requiredFields) {
         expect(schemaShape).toHaveProperty(field)
@@ -226,8 +226,20 @@ describe('Schema Type Inference', () => {
     const testBill: InferredBill = {
       id: 'test',
       archived: false,
-      vendorId: 'vendor-id',
-      amount: 100,
+      creditAmount: 0,
+      dueDate: '2024-01-31',
+      invoice: {
+        invoiceNumber: 'INV-001',
+        invoiceDate: '2024-01-01',
+      },
+      billLineItems: [
+        {
+          description: 'Test item',
+          amount: 100,
+        },
+      ],
+      paymentStatus: 'UNPAID',
+      approvalStatus: 'UNASSIGNED',
       createdTime: '2024-01-01T00:00:00Z',
       updatedTime: '2024-01-01T00:00:00Z',
     }

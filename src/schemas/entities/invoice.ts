@@ -1,6 +1,8 @@
 import { z } from 'zod'
+import { ListParamsSchema } from '../common'
 
 export const InvoiceStatusSchema = z.enum([
+  'OPEN',
   'PARTIAL_PAYMENT',
   'PAID',
   'SCHEDULED',
@@ -72,11 +74,15 @@ export const InvoiceSchema = z.object({
   invoicePdfId: z.string().optional(),
 })
 
+export const InvoiceCustomerSchema = z.object({
+  id: z.string(),
+})
+
 export const CreateInvoiceRequestSchema = z.object({
   invoiceNumber: z.string(),
   invoiceDate: z.string(),
   dueDate: z.string(),
-  customerId: z.string(),
+  customer: InvoiceCustomerSchema,
   invoiceLineItems: z.array(InvoiceLineItemSchema.omit({ id: true })),
   payToChartOfAccountId: z.string().optional(),
   classifications: InvoiceClassificationsSchema.optional(),
@@ -102,20 +108,7 @@ export const UpdateInvoiceRequestSchema = z.object({
   convenienceFee: InvoiceConvenienceFeeSchema.optional(),
 })
 
-export const InvoiceListParamsSchema = z.object({
-  max: z.number().optional(),
-  page: z.string().optional(),
-  filters: z
-    .array(
-      z.object({
-        field: z.string(),
-        op: z.string(),
-        value: z.unknown(),
-      })
-    )
-    .optional(),
-  sort: z.array(z.object({ field: z.string(), order: z.enum(['asc', 'desc']) })).optional(),
-})
+export const InvoiceListParamsSchema = ListParamsSchema
 
 // Infer types from schemas
 export type InvoiceStatus = z.infer<typeof InvoiceStatusSchema>
@@ -125,6 +118,7 @@ export type InvoiceLineItemClassifications = z.infer<typeof InvoiceLineItemClass
 export type InvoiceLineItem = z.infer<typeof InvoiceLineItemSchema>
 export type InvoicePayment = z.infer<typeof InvoicePaymentSchema>
 export type InvoiceConvenienceFee = z.infer<typeof InvoiceConvenienceFeeSchema>
+export type InvoiceCustomer = z.infer<typeof InvoiceCustomerSchema>
 export type Invoice = z.infer<typeof InvoiceSchema>
 export type CreateInvoiceRequest = z.infer<typeof CreateInvoiceRequestSchema>
 export type UpdateInvoiceRequest = z.infer<typeof UpdateInvoiceRequestSchema>

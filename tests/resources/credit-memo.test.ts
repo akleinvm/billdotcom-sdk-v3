@@ -109,6 +109,7 @@ describe('CreditMemoResource', () => {
       const creditMemoData: CreateCreditMemoRequest = {
         customerId: testCustomer.id,
         creditDate: today.toISOString().split('T')[0],
+        referenceNumber: `CM-MIN-${Date.now()}`,
         creditMemoLineItems: [
           {
             description: 'Basic Credit',
@@ -158,6 +159,7 @@ describe('CreditMemoResource', () => {
       const creditMemoData: CreateCreditMemoRequest = {
         customerId: testCustomer.id,
         creditDate: today.toISOString().split('T')[0],
+        referenceNumber: `CM-MULTI-${Date.now()}`,
         creditMemoLineItems: [
           {
             description: 'Credit Item A',
@@ -186,10 +188,12 @@ describe('CreditMemoResource', () => {
       const creditMemoData: CreateCreditMemoRequest = {
         customerId: testCustomer.id,
         creditDate: today.toISOString().split('T')[0],
+        referenceNumber: `CM-AMT-${Date.now()}`,
         creditMemoLineItems: [
           {
             description: 'Fixed Amount Credit',
-            amount: 100,
+            price: 100,
+            quantity: 1,
           },
         ],
       }
@@ -222,6 +226,7 @@ describe('CreditMemoResource', () => {
       const created = await client.creditMemos.create({
         customerId: testCustomer.id,
         creditDate: today.toISOString().split('T')[0],
+        referenceNumber: `CM-UPD-DESC-${Date.now()}`,
         description: 'Original description',
         creditMemoLineItems: [
           {
@@ -276,6 +281,7 @@ describe('CreditMemoResource', () => {
       const created = await client.creditMemos.create({
         customerId: testCustomer.id,
         creditDate: today.toISOString().split('T')[0],
+        referenceNumber: `CM-ARCH-${Date.now()}`,
         creditMemoLineItems: [
           {
             description: 'Test Credit',
@@ -296,6 +302,7 @@ describe('CreditMemoResource', () => {
       const created = await client.creditMemos.create({
         customerId: testCustomer.id,
         creditDate: today.toISOString().split('T')[0],
+        referenceNumber: `CM-REST-${Date.now()}`,
         creditMemoLineItems: [
           {
             description: 'Test Credit',
