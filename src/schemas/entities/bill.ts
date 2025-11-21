@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
-export const BillPaymentStatusSchema = z.enum(['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED'])
+export const BillPaymentStatusSchema = z.enum(['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED', 'UNDEFINED'])
 
 export const BillApprovalStatusSchema = z.enum(['UNASSIGNED', 'ASSIGNED', 'APPROVING', 'APPROVED', 'DENIED'])
 
-export const ApproverStatusSchema = z.enum(['WAITING', 'APPROVED', 'DENIED'])
+export const ApproverStatusSchema = z.enum(['WAITING', 'APPROVED', 'DENIED', 'REROUTED', 'UNDEFINED'])
 
 export const BillApproverSchema = z.object({
   userId: z.string(),
