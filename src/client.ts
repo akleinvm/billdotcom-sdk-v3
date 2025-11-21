@@ -10,6 +10,10 @@ import { VendorResource } from './resources/vendor.js'
 import { BillResource } from './resources/bill.js'
 import { ChartOfAccountsResource } from './resources/chart-of-accounts.js'
 import { AccountingClassResource } from './resources/accounting-class.js'
+import { CustomerResource } from './resources/customer.js'
+import { InvoiceResource } from './resources/invoice.js'
+import { PaymentResource } from './resources/payment.js'
+import { CreditMemoResource } from './resources/credit-memo.js'
 
 const BASE_URLS = {
   sandbox: 'https://gateway.stage.bill.com/connect',
@@ -25,6 +29,10 @@ export class BillClient {
   public readonly bills: BillResource
   public readonly chartOfAccounts: ChartOfAccountsResource
   public readonly accountingClasses: AccountingClassResource
+  public readonly customers: CustomerResource
+  public readonly invoices: InvoiceResource
+  public readonly payments: PaymentResource
+  public readonly creditMemos: CreditMemoResource
 
   constructor(config: BillClientConfig) {
     this.config = {
@@ -40,6 +48,10 @@ export class BillClient {
     this.bills = new BillResource(getConfig)
     this.chartOfAccounts = new ChartOfAccountsResource(getConfig)
     this.accountingClasses = new AccountingClassResource(getConfig)
+    this.customers = new CustomerResource(getConfig)
+    this.invoices = new InvoiceResource(getConfig)
+    this.payments = new PaymentResource(getConfig)
+    this.creditMemos = new CreditMemoResource(getConfig)
   }
 
   private getRequestConfig(): RequestConfig {
