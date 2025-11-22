@@ -43,25 +43,7 @@ export const CHART_OF_ACCOUNT_SORTABLE_FIELDS = ['name', 'createdTime', 'updated
 // Zod Schemas
 // ============================================================================
 
-export const AccountTypeSchema = z.enum([
-  'UNSPECIFIED',
-  'ACCOUNTS_PAYABLE',
-  'ACCOUNTS_RECEIVABLE',
-  'BANK',
-  'COST_OF_GOODS_SOLD',
-  'CREDIT_CARD',
-  'EQUITY',
-  'EXPENSE',
-  'FIXED_ASSET',
-  'INCOME',
-  'LONG_TERM_LIABILITY',
-  'OTHER_ASSET',
-  'OTHER_CURRENT_ASSET',
-  'OTHER_CURRENT_LIABILITY',
-  'OTHER_EXPENSE',
-  'OTHER_INCOME',
-  'NON_POSTING',
-])
+export const AccountTypeSchema = z.enum(ACCOUNT_TYPES)
 
 export const ChartOfAccountSchema = z.object({
   /** Unique identifier for the chart of account */

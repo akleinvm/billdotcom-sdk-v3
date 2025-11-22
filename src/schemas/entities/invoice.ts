@@ -39,16 +39,9 @@ export const INVOICE_SORTABLE_FIELDS = ['invoiceDate', 'dueDate', 'totalAmount',
 // Zod Schemas
 // ============================================================================
 
-export const InvoiceStatusSchema = z.enum([
-  'OPEN',
-  'PARTIAL_PAYMENT',
-  'PAID',
-  'SCHEDULED',
-  'VOID',
-  'UNDEFINED',
-])
+export const InvoiceStatusSchema = z.enum(INVOICE_STATUSES)
 
-export const InvoicePaymentStatusSchema = z.enum(['PAID', 'SCHEDULED', 'UNDEFINED'])
+export const InvoicePaymentStatusSchema = z.enum(INVOICE_PAYMENT_STATUSES)
 
 export const InvoiceClassificationsSchema = z.object({
   accountingClassId: z.string().optional(),

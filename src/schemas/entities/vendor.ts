@@ -57,7 +57,7 @@ export const VENDOR_SORTABLE_FIELDS = ['name', 'createdTime', 'updatedTime'] as 
 // Zod Schemas
 // ============================================================================
 
-export const VendorAccountTypeSchema = z.enum(['BUSINESS', 'PERSON', 'NONE', 'UNDEFINED'])
+export const VendorAccountTypeSchema = z.enum(VENDOR_ACCOUNT_TYPES)
 
 export const VendorAddressSchema = z.object({
   line1: z.string().optional(),
@@ -69,9 +69,9 @@ export const VendorAddressSchema = z.object({
   countryName: z.string().optional(),
 })
 
-export const VendorBankAccountTypeSchema = z.enum(['CHECKING', 'SAVINGS'])
+export const VendorBankAccountTypeSchema = z.enum(VENDOR_BANK_ACCOUNT_TYPES)
 
-export const VendorBankAccountOwnerTypeSchema = z.enum(['BUSINESS', 'PERSON'])
+export const VendorBankAccountOwnerTypeSchema = z.enum(VENDOR_BANK_ACCOUNT_OWNER_TYPES)
 
 export const VendorBankAccountSchema = z.object({
   nameOnAccount: z.string().optional(),
@@ -82,23 +82,15 @@ export const VendorBankAccountSchema = z.object({
   paymentCurrency: z.string().optional(),
 })
 
-export const VendorVirtualCardStatusSchema = z.enum([
-  'ENROLLED',
-  'UNENROLLED',
-  'PENDING',
-  'UNKNOWN',
-  'VERBAL_COMMITMENT',
-  'REQUIRE_MORE_INFO',
-  'UNDEFINED',
-])
+export const VendorVirtualCardStatusSchema = z.enum(VENDOR_VIRTUAL_CARD_STATUSES)
 
-export const VendorPayByTypeSchema = z.enum(['ACH', 'CHECK', 'VIRTUAL_CARD', 'RPPS', 'UNDEFINED'])
+export const VendorPayByTypeSchema = z.enum(VENDOR_PAY_BY_TYPES)
 
-export const VendorPayBySubTypeSchema = z.enum(['MULTIPLE', 'LOCAL', 'WIRE', 'UNDEFINED', 'NONE'])
+export const VendorPayBySubTypeSchema = z.enum(VENDOR_PAY_BY_SUB_TYPES)
 
-export const VendorTaxIdTypeSchema = z.enum(['SSN', 'EIN', 'UNDEFINED'])
+export const VendorTaxIdTypeSchema = z.enum(VENDOR_TAX_ID_TYPES)
 
-export const VendorAlternatePayByTypeSchema = z.enum(['UNDEFINED', 'CREDIT_CARD', 'AMEX'])
+export const VendorAlternatePayByTypeSchema = z.enum(VENDOR_ALTERNATE_PAY_BY_TYPES)
 
 export const VendorVirtualCardSchema = z.object({
   status: VendorVirtualCardStatusSchema.optional(),

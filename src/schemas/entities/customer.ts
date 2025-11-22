@@ -27,7 +27,7 @@ export const CUSTOMER_SORTABLE_FIELDS = ['name', 'createdTime', 'updatedTime'] a
 // Zod Schemas
 // ============================================================================
 
-export const CustomerAccountTypeSchema = z.enum(['BUSINESS', 'PERSON', 'NONE'])
+export const CustomerAccountTypeSchema = z.enum(CUSTOMER_ACCOUNT_TYPES)
 
 export const CustomerContactSchema = z.object({
   firstName: z.string().optional(),

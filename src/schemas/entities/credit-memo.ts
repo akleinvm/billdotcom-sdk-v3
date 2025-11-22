@@ -27,11 +27,7 @@ export const CREDIT_MEMO_SORTABLE_FIELDS = ['creditDate', 'amount', 'createdTime
 // Zod Schemas
 // ============================================================================
 
-export const CreditMemoStatusSchema = z.enum([
-  'NOT_APPLIED',
-  'PARTIALLY_APPLIED',
-  'FULLY_APPLIED',
-])
+export const CreditMemoStatusSchema = z.enum(CREDIT_MEMO_STATUSES)
 
 export const CreditMemoClassificationsSchema = z.object({
   accountingClassId: z.string().optional(),

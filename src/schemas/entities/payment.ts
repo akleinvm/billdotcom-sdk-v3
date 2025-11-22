@@ -68,49 +68,15 @@ export const PAYMENT_SORTABLE_FIELDS = ['processDate', 'amount', 'createdTime', 
 // Zod Schemas
 // ============================================================================
 
-export const PaymentStatusSchema = z.enum([
-  'APPROVING',
-  'PAID',
-  'VOID',
-  'SCHEDULED',
-  'FAILED',
-  'PENDING',
-  'UNDEFINED',
-])
+export const PaymentStatusSchema = z.enum(PAYMENT_STATUSES)
 
-export const PaymentDisbursementTypeSchema = z.enum([
-  'ACH',
-  'CHECK',
-  'RPPS',
-  'INTERNATIONAL',
-  'VCARD',
-  'WALLET',
-  'OFFLINE',
-  'UNDEFINED',
-])
+export const PaymentDisbursementTypeSchema = z.enum(PAYMENT_DISBURSEMENT_TYPES)
 
-export const PaymentDisbursementStatusSchema = z.enum([
-  'DONE',
-  'FAILED',
-  'IN_PROGRESS',
-  'UNDEFINED',
-])
+export const PaymentDisbursementStatusSchema = z.enum(PAYMENT_DISBURSEMENT_STATUSES)
 
-export const PaymentFundingAccountTypeSchema = z.enum([
-  'BANK_ACCOUNT',
-  'CARD_ACCOUNT',
-  'AP_CARD',
-  'UNDEFINED',
-])
+export const PaymentFundingAccountTypeSchema = z.enum(PAYMENT_FUNDING_ACCOUNT_TYPES)
 
-export const PaymentSingleStatusSchema = z.enum([
-  'CLEARED',
-  'VOID_PENDING',
-  'SCHEDULED',
-  'PAID',
-  'FAILED',
-  'UNDEFINED',
-])
+export const PaymentSingleStatusSchema = z.enum(PAYMENT_SINGLE_STATUSES)
 
 export const PaymentFundingAccountSchema = z.object({
   type: PaymentFundingAccountTypeSchema.optional(),

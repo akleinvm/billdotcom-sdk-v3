@@ -34,11 +34,11 @@ export const BILL_SORTABLE_FIELDS = ['dueDate', 'amount', 'createdTime', 'update
 // Zod Schemas
 // ============================================================================
 
-export const BillPaymentStatusSchema = z.enum(['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED', 'UNDEFINED'])
+export const BillPaymentStatusSchema = z.enum(BILL_PAYMENT_STATUSES)
 
-export const BillApprovalStatusSchema = z.enum(['UNASSIGNED', 'ASSIGNED', 'APPROVING', 'APPROVED', 'DENIED'])
+export const BillApprovalStatusSchema = z.enum(BILL_APPROVAL_STATUSES)
 
-export const ApproverStatusSchema = z.enum(['WAITING', 'APPROVED', 'DENIED', 'REROUTED', 'UNDEFINED'])
+export const ApproverStatusSchema = z.enum(APPROVER_STATUSES)
 
 export const BillApproverSchema = z.object({
   userId: z.string(),
