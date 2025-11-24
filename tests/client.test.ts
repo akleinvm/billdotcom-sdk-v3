@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { BillClient } from '../src/client.js'
-import { AuthenticationError } from '../src/utils/errors.js'
+import { AuthenticationError, ConfigurationError } from '../src/utils/errors.js'
 import { testConfig, validateTestConfig } from './setup.js'
 
 describe('BillClient', () => {
@@ -171,6 +171,64 @@ describe('BillClient', () => {
       expect(client.bills).toBeDefined()
       expect(client.chartOfAccounts).toBeDefined()
       expect(client.accountingClasses).toBeDefined()
+    })
+  })
+
+  describe('deferred configuration', () => {
+    it('should create client without credentials', () => {
+      const client = new BillClient()
+      expect(client).toBeDefined()
+      expect(client.isLoggedIn()).toBe(false)
+      expect(client.isConfigured()).toBe(false)
+    })
+
+    it('should create client with only autoLogin option', () => {
+      const client = new BillClient({ autoLogin: false })
+      expect(client).toBeDefined()
+      expect(client.isConfigured()).toBe(false)
+    })
+
+    it('should throw ConfigurationError when using resources before login', async () => {
+      const client = new BillClient()
+
+      await expect(client.vendors.list()).rejects.toThrow(ConfigurationError)
+    })
+
+    it('should login with credentials passed to login()', async () => {
+      const client = new BillClient()
+
+      const session = await client.login(testConfig)
+
+      expect(session).toBeDefined()
+      expect(session.sessionId).toBeDefined()
+      expect(client.isLoggedIn()).toBe(true)
+      expect(client.isConfigured()).toBe(true)
+
+      await client.logout()
+    })
+
+    it('should use resources after login with deferred credentials', async () => {
+      const client = new BillClient({ autoLogin: false })
+
+      await client.login(testConfig)
+
+      // Just verify we can call list without error
+      const vendors = await client.vendors.list()
+      expect(vendors).toBeDefined()
+
+      await client.logout()
+    })
+
+    it('should throw ConfigurationError when calling login without credentials', async () => {
+      const client = new BillClient()
+
+      await expect(client.login()).rejects.toThrow(ConfigurationError)
+    })
+
+    it('should throw when ensureLoggedIn is called without credentials', async () => {
+      const client = new BillClient({ autoLogin: true })
+
+      await expect(client.ensureLoggedIn()).rejects.toThrow(AuthenticationError)
     })
   })
 })

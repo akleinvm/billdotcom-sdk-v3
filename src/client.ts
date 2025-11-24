@@ -1,10 +1,12 @@
 import type {
   BillClientConfig,
+  BillClientOptions,
+  LoginCredentials,
   LoginResponse,
   SessionInfo,
 } from './types/common.js'
 import { makeRequest, type RequestConfig } from './utils/request.js'
-import { AuthenticationError, SessionExpiredError } from './utils/errors.js'
+import { AuthenticationError, ConfigurationError, SessionExpiredError } from './utils/errors.js'
 
 import { VendorResource } from './resources/vendor.js'
 import { BillResource } from './resources/bill.js'
@@ -21,9 +23,10 @@ const BASE_URLS = {
 } as const
 
 export class BillClient {
-  private readonly config: BillClientConfig
+  private credentials: LoginCredentials | null = null
+  private readonly autoLogin: boolean
   private session: SessionInfo | null = null
-  private readonly baseUrl: string
+  private baseUrl: string = BASE_URLS.sandbox
 
   public readonly vendors: VendorResource
   public readonly bills: BillResource
@@ -34,13 +37,28 @@ export class BillClient {
   public readonly payments: PaymentResource
   public readonly creditMemos: CreditMemoResource
 
-  constructor(config: BillClientConfig) {
-    this.config = {
-      autoLogin: true,
-      environment: 'sandbox',
-      ...config,
+  constructor(options?: BillClientOptions)
+  /**
+   * @deprecated Pass credentials to login() instead
+   */
+  constructor(config: BillClientConfig)
+  constructor(config?: BillClientOptions | BillClientConfig) {
+    // Check if this is legacy usage with full credentials
+    if (config && 'devKey' in config) {
+      // Legacy: full config provided in constructor
+      this.credentials = {
+        username: config.username,
+        password: config.password,
+        organizationId: config.organizationId,
+        devKey: config.devKey,
+        environment: config.environment,
+      }
+      this.autoLogin = config.autoLogin ?? true
+      this.baseUrl = BASE_URLS[config.environment ?? 'sandbox']
+    } else {
+      // New: only options provided, credentials will come via login()
+      this.autoLogin = config?.autoLogin ?? true
     }
-    this.baseUrl = BASE_URLS[this.config.environment ?? 'sandbox']
 
     const getConfig = () => this.getRequestConfig()
 
@@ -55,27 +73,44 @@ export class BillClient {
   }
 
   private getRequestConfig(): RequestConfig {
+    if (!this.credentials) {
+      throw new ConfigurationError(
+        'Client not configured. Call login() with credentials first.'
+      )
+    }
     return {
       baseUrl: this.baseUrl,
-      devKey: this.config.devKey,
+      devKey: this.credentials.devKey,
       sessionId: this.session?.sessionId,
     }
   }
 
-  async login(): Promise<SessionInfo> {
+  async login(credentials?: LoginCredentials): Promise<SessionInfo> {
+    // If credentials provided, store them
+    if (credentials) {
+      this.credentials = credentials
+      this.baseUrl = BASE_URLS[credentials.environment ?? 'sandbox']
+    }
+
+    if (!this.credentials) {
+      throw new ConfigurationError(
+        'No credentials provided. Pass credentials to login() or constructor.'
+      )
+    }
+
     const response = await makeRequest<LoginResponse>(
       {
         baseUrl: this.baseUrl,
-        devKey: this.config.devKey,
+        devKey: this.credentials.devKey,
       },
       {
         method: 'POST',
         path: '/v3/login',
         body: {
-          username: this.config.username,
-          password: this.config.password,
-          organizationId: this.config.organizationId,
-          devKey: this.config.devKey,
+          username: this.credentials.username,
+          password: this.credentials.password,
+          organizationId: this.credentials.organizationId,
+          devKey: this.credentials.devKey,
         },
       }
     )
@@ -107,11 +142,11 @@ export class BillClient {
 
   async ensureLoggedIn(): Promise<void> {
     if (!this.session) {
-      if (this.config.autoLogin) {
+      if (this.autoLogin && this.credentials) {
         await this.login()
       } else {
         throw new AuthenticationError(
-          'Not logged in. Call login() first or set autoLogin to true.'
+          'Not logged in. Call login() with credentials first.'
         )
       }
     }
@@ -131,11 +166,15 @@ export class BillClient {
     try {
       return await operation()
     } catch (error) {
-      if (error instanceof SessionExpiredError && this.config.autoLogin) {
+      if (error instanceof SessionExpiredError && this.autoLogin) {
         await this.login()
         return await operation()
       }
       throw error
     }
+  }
+
+  isConfigured(): boolean {
+    return this.credentials !== null
   }
 }

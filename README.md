@@ -25,16 +25,17 @@ import {
   BILL_PAYMENT_STATUSES, // ['PAID', 'UNPAID', 'PARTIAL', 'SCHEDULED', 'UNDEFINED']
 } from 'billdotcom-sdk-v3'
 
-const client = new BillClient({
+// Create client (credentials supplied at login)
+const client = new BillClient()
+
+// Login with credentials
+await client.login({
   username: 'your-username',
   password: 'your-password',
   organizationId: 'your-org-id',
   devKey: 'your-dev-key',
   environment: 'sandbox', // or 'production'
 })
-
-// Login (auto-login is enabled by default)
-await client.login()
 
 // List vendors
 const vendors = await client.vendors.list()
@@ -64,15 +65,67 @@ await client.logout()
 
 ## Configuration
 
+### Constructor Options
+
 ```typescript
-interface BillClientConfig {
+interface BillClientOptions {
+  autoLogin?: boolean // default: true
+}
+```
+
+### Login Credentials
+
+```typescript
+interface LoginCredentials {
   username: string
   password: string
   organizationId: string
   devKey: string
   environment?: 'sandbox' | 'production' // default: 'sandbox'
-  autoLogin?: boolean // default: true
 }
+```
+
+### Deferred Configuration
+
+You can create the client without credentials and supply them later at login time:
+
+```typescript
+// Create client without credentials
+const client = new BillClient()
+
+// Or with autoLogin disabled
+const client = new BillClient({ autoLogin: false })
+
+// Check if configured
+console.log(client.isConfigured()) // false
+
+// Later, login with credentials
+await client.login({
+  username: 'your-username',
+  password: 'your-password',
+  organizationId: 'your-org-id',
+  devKey: 'your-dev-key',
+  environment: 'production',
+})
+
+console.log(client.isConfigured()) // true
+```
+
+### Legacy Configuration (deprecated)
+
+The old pattern of passing credentials to the constructor still works but is deprecated:
+
+```typescript
+// Deprecated: pass credentials to login() instead
+const client = new BillClient({
+  username: 'your-username',
+  password: 'your-password',
+  organizationId: 'your-org-id',
+  devKey: 'your-dev-key',
+  environment: 'sandbox',
+  autoLogin: true,
+})
+await client.login()
 ```
 
 ## Available Resources
@@ -294,12 +347,15 @@ import {
   NotFoundError,
   ValidationError,
   SessionExpiredError,
+  ConfigurationError,
 } from 'billdotcom-sdk-v3'
 
 try {
   const vendor = await client.vendors.get('invalid-id')
 } catch (error) {
-  if (error instanceof NotFoundError) {
+  if (error instanceof ConfigurationError) {
+    console.log('Client not configured - call login() with credentials first')
+  } else if (error instanceof NotFoundError) {
     console.log('Vendor not found')
   } else if (error instanceof AuthenticationError) {
     console.log('Authentication failed')
@@ -317,10 +373,20 @@ try {
 ## Session Management
 
 ```typescript
-// Manual login
-await client.login()
+// Login with credentials
+await client.login({
+  username: 'your-username',
+  password: 'your-password',
+  organizationId: 'your-org-id',
+  devKey: 'your-dev-key',
+})
 
-// Check if logged in
+// Check if configured (credentials provided)
+if (client.isConfigured()) {
+  console.log('Client has credentials')
+}
+
+// Check if logged in (has active session)
 if (client.isLoggedIn()) {
   console.log('Logged in')
 }
@@ -329,7 +395,7 @@ if (client.isLoggedIn()) {
 const session = client.getSession()
 console.log(session?.sessionId)
 
-// Ensure logged in (auto-login if needed)
+// Ensure logged in (auto-login if credentials configured and autoLogin is true)
 await client.ensureLoggedIn()
 
 // Execute with auto-retry on session expiration

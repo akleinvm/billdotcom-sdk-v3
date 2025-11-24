@@ -1,3 +1,18 @@
+export interface BillClientOptions {
+  autoLogin?: boolean
+}
+
+export interface LoginCredentials {
+  username: string
+  password: string
+  organizationId: string
+  devKey: string
+  environment?: 'sandbox' | 'production'
+}
+
+/**
+ * @deprecated Use BillClientOptions for constructor and LoginCredentials for login()
+ */
 export interface BillClientConfig {
   username: string
   password: string
